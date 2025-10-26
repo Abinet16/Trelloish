@@ -1,0 +1,14 @@
+.env
+node_modules
+dist
+logs
+.DS_Store
+yarn.lock
+.env.test
+.env.local
+.env.development
+.env.production
+.env.test
+.vscode
+.idea
+*.log
