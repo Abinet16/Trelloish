@@ -1,6 +1,6 @@
 
 
-# Full Stack Collaboration Platform(Trelloish) API (Backend)
+# Full Stack Collaboration Platform(Trelloish) API (Backend) and minimal Frontend
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)
