@@ -1,20 +1,17 @@
 // src/main.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
+import {App} from "./App.tsx";
 import "./index.css";
 import { ApolloProvider } from "@apollo/client/react";
 import { client } from "./api/apolloClient.ts";
-import { AuthProvider } from "./context/AuthContext.tsx";
-import { Toaster } from "@/components/ui/toaster"; // Import Toaster
+import { Toaster } from "@/components/ui/toaster";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <AuthProvider>
-        <App />
-        <Toaster /> {/* Add Toaster here */}
-      </AuthProvider>
+      <App /> {/* The App component now contains the AuthProvider */}
+      <Toaster />
     </ApolloProvider>
   </React.StrictMode>
 );

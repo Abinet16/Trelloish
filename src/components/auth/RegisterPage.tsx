@@ -1,6 +1,8 @@
-// src/components/Auth.tsx
+// src/components/auth/RegisterPage.tsx
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+import { useMutation } from "@apollo/client/react";
+import { REGISTER_MUTATION } from "@/api/graphql";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,53 +15,46 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
-export const Auth = () => {
-  const [email, setEmail] = useState("test@example.com"); // Pre-fill for convenience
-  const [password, setPassword] = useState("password123");
-  const [loading, setLoading] = useState(false);
+export function RegisterPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { login } = useAuth();
   const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const response = await fetch("http://localhost:4000/rest/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.message || "Login failed");
-
-      login(data.accessToken);
-      toast({ title: "Login Successful", description: "Welcome back!" });
-      setTimeout(() => window.location.reload(), 1000); // Give toast time to show
-    } catch (err) {
+  const [register, { loading }] = useMutation(REGISTER_MUTATION, {
+    onCompleted: (data: any) => {
+      login(data.register.accessToken, data.register.user);
+      toast({ title: "Registration Successful", description: "Welcome!" });
+      // The router in App.tsx will automatically redirect to the dashboard
+    },
+    onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: (err as Error).message,
+        title: "Registration Failed",
+        description: error.message,
       });
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    register({ variables: { email, password } });
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle>Welcome to Trelloish</CardTitle>
+          <CardTitle>Create an Account</CardTitle>
           <CardDescription>
-            Enter your credentials to access your dashboard.
+            Enter your email and password to get started.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleRegister}>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="email">Email</Label>
@@ -84,15 +79,18 @@ export const Auth = () => {
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            (Register via GraphQL first)
+            Already have an account?{" "}
+            <Link to="/login" className="underline">
+              Login
+            </Link>
           </p>
-          <Button onClick={handleLogin} disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+          <Button onClick={handleRegister} disabled={loading}>
+            {loading ? "Registering..." : "Register"}
           </Button>
         </CardFooter>
       </Card>
     </div>
   );
-};
+}
